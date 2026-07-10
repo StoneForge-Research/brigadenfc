@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stoneforge Research & Earth Fund</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes text-glitch {
+            0%, 100% { opacity: 1; transform: translate(0); }
+            2% { opacity: 0.8; transform: translate(-2px, 1px); }
+            4% { opacity: 1; transform: translate(0); }
+            41% { opacity: 1; transform: translate(0); }
+            42% { opacity: 0.6; transform: translate(2px, -1px) skewX(-0.5deg); }
+            43% { opacity: 0.9; transform: translate(-1px, 0); clip-path: inset(20% 0 60% 0); }
+            44% { opacity: 1; transform: translate(0); clip-path: none; }
+            80% { opacity: 1; transform: translate(0); }
+            81% { opacity: 0.7; transform: translate(1px, 1px); }
+            82% { opacity: 1; transform: translate(0); }
+        }
+
+        .animate-glitch {
+            animation: text-glitch 5s ease-in-out infinite;
+        }
+
+        @keyframes title-reveal {
+            from { opacity: 0; transform: translateY(20px); filter: blur(8px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+
+        .animate-title-reveal {
+            animation: title-reveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+
+        .animate-title-reveal-delay {
+            animation: title-reveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+            opacity: 0;
+        }
+
+        .animate-title-reveal-delay-2 {
+            animation: title-reveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
+            opacity: 0;
+        }
+
+        @keyframes leaf-fall {
+            0% {
+                transform: translateY(-30px) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.2;
+            }
+            50% {
+                transform: translateY(50vh) translateX(var(--drift)) rotate(180deg);
+                opacity: 0.15;
+            }
+            100% {
+                transform: translateY(calc(100vh - 100px)) translateX(calc(var(--drift) * -0.5)) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .animate-leaf-fall {
+            animation: leaf-fall linear infinite;
+        }
+    </style>
+</head>
+<body class="m-0 p-0 overflow-hidden bg-white">
+    <!-- Leaf Particles Background -->
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden" id="leaf-container"></div>
+
+    <!-- Canvas for green particles -->
+    <canvas id="particle-canvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+    <!-- Main Content -->
+    <div class="fixed inset-0 flex items-center justify-center z-40 overflow-hidden">
+        <div class="relative z-10 text-center max-w-5xl px-8">
+            <div class="animate-title-reveal">
+                <div class="flex items-center justify-center gap-5 mb-16">
+                    <span class="text-xl md:text-2xl font-black tracking-[0.2em] text-[#1a1a1a] uppercase">Stoneforge Research</span>
+                    <span class="text-[#D1855C] text-2xl font-extralight">&amp;</span>
+                    <span id="earth-fund-text" class="text-xl md:text-2xl font-black tracking-[0.2em] text-[#16A34A] uppercase">Earth Fund</span>
+                </div>
+            </div>
+
+            <h1 class="animate-title-reveal-delay animate-glitch">
+                <span class="block text-6xl md:text-[6.5rem] font-black tracking-tight text-[#1a1a1a] leading-[0.85]">
+                    Let's Build This
+                </span>
+                <span class="block text-5xl md:text-6xl font-light tracking-tight text-[#D1855C]/80 leading-[1.2] mt-4">
+                    Together
+                </span>
+            </h1>
+
+            <div class="animate-title-reveal-delay-2 mt-16">
+                <div class="inline-block border-t border-[#e5e5e5] pt-6">
+                    <span class="text-sm uppercase tracking-[0.3em] text-[#999999] font-medium">
+                        X-Ray Vision for the Planet's Infrastructure &nbsp;&bull;&nbsp; Starting Now
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Leaf particles
+        const leafContainer = document.getElementById('leaf-container');
+        const leafData = Array.from({ length: 12 }, (_, i) => ({
+            left: `${8 + (i * 7.5) % 90}%`,
+            delay: `${i * 1.2}s`,
+            duration: `${6 + (i % 4) * 2}s`,
+            size: 10 + (i % 3) * 4,
+            drift: i % 2 === 0 ? 1 : -1,
+        }));
+
+        leafData.forEach(p => {
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('class', 'absolute opacity-15 text-[#D1855C] animate-leaf-fall');
+            svg.style.left = p.left;
+            svg.style.top = '-30px';
+            svg.style.animationDelay = p.delay;
+            svg.style.animationDuration = p.duration;
+            svg.style.setProperty('--drift', `${p.drift * 40}px`);
+            svg.setAttribute('width', p.size);
+            svg.setAttribute('height', p.size);
+            svg.setAttribute('viewBox', '0 0 24 24');
+            svg.setAttribute('fill', '#D1855C');
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', 'M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66l.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8z');
+            svg.appendChild(path);
+            leafContainer.appendChild(svg);
+        });
+
+        // Green particle animation
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        const targetEl = document.getElementById('earth-fund-text');
+        const particles = [];
+        let counter = 0;
+
+        const greenColors = [
+            [22, 163, 74],
+            [34, 197, 94],
+            [74, 222, 128],
+            [16, 130, 60],
+        ];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        function emit() {
+            if (!targetEl) return;
+            const rect = targetEl.getBoundingClientRect();
+            if (rect.bottom < 0 || rect.top > canvas.height) return;
+
+            const color = greenColors[Math.floor(Math.random() * greenColors.length)];
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+
+            let x, y;
+            const edge = Math.floor(Math.random() * 4);
+            if (edge === 0) { x = rect.left + Math.random() * rect.width; y = rect.top; }
+            else if (edge === 1) { x = rect.left + Math.random() * rect.width; y = rect.bottom; }
+            else if (edge === 2) { x = rect.left; y = rect.top + Math.random() * rect.height; }
+            else { x = rect.right; y = rect.top + Math.random() * rect.height; }
+
+            const dx = x - cx;
+            const dy = y - cy;
+            const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+            const speed = 0.02 + Math.random() * 0.03;
+
+            particles.push({
+                x, y,
+                vx: (dx / dist) * speed,
+                vy: (dy / dist) * speed,
+                life: 1,
+                size: Math.random() * 2 + 0.5,
+                type: Math.random() < 0.2 ? 'cross' : 'dot',
+                color,
+            });
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            counter++;
+            if (counter % 90 === 0) emit();
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= 0.002;
+                p.size *= 0.998;
+
+                if (p.life <= 0 || p.size < 0.1) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+
+                const [r, g, b] = p.color;
+                if (p.type === 'cross') {
+                    const len = p.size * 2.5;
+                    ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${p.life * 0.8})`;
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(p.x - len, p.y);
+                    ctx.lineTo(p.x + len, p.y);
+                    ctx.moveTo(p.x, p.y - len);
+                    ctx.lineTo(p.x, p.y + len);
+                    ctx.stroke();
+                } else {
+                    const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 3);
+                    gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${p.life * 0.9})`);
+                    gradient.addColorStop(0.4, `rgba(${r}, ${g}, ${b}, ${p.life * 0.5})`);
+                    gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
+                    ctx.fillStyle = gradient;
+                    ctx.fill();
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
